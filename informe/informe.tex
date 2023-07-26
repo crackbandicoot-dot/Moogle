@@ -1,0 +1,144 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\title{\textbf{Moogle!} : Proyecto de Programación I}
+\author{Cristhian Delgado García}
+\date{}
+\begin{document}
+
+%íáúóéñ
+\definecolor{cyan_opaco}{RGB}{0,153,153} 
+\definecolor{blue_opaco}{RGB}{0,0,153}
+\newcommand{\class}[1]{\textcolor{cyan_opaco}{\texttt{#1}}}
+\newcommand{\keyword}[1]{\textcolor{blue_opaco}{\texttt{#1}}}
+\maketitle
+\section{Introducción} \textbf{Moogle!} es un pequeño motor de búsqueda hecho en \textbf{C\#} basado en el \textbf{\mbox{Modelo} de Espacio Vectorial} que permite hacer consultas sobre un conjunto de archivos con extensión \textit{.txt}; dichas consultas aspiran a arrojar los resultados más adecuados sin comprometer la simplicidad del buscador. A lo largo de este informe se explicarán brevemente los fundamentos matemáticos que dan paso a su implementación y su implementación en sí.
+\section{Desarrollo}
+\subsection{Los fundamentos matemáticos}
+\begin{itemize}
+\item \textbf{Modelo de Espacio Vectorial} : Se conoce como modelo de espacio vectorial a un modelo algebraico utilizado para filtrado, recuperación, indexado y cálculo de relevancia de información. Representa documentos en lenguaje natural de una manera formal mediante el uso de vectores (de identificadores, por ejemplo términos\footnote{Se considera en esta implementación como término a una palabra tomada sin repitición del cuerpo de documentos.} de búsqueda) en un espacio lineal multidimensional.
+En el área de recuperación de información normalmente se usa una expresión vectorial, donde las dimensiones del vector representan términos, frases o conceptos que aparecen en el documento. En este aspecto la representación más adoptada es la conocida como bolsa de palabras: una colección de documentos compuesta por \textbf{n} documentos indexados y \textbf{m} términos representados por una matriz documentos-términos de \textbf{n} x \textbf{m}. Donde los \textit{m}-vectores fila\footnote{Aunque aquí se explican la representación de los documentos en vectores fila y los términos en vectores columna en esta implementación serán tratados de manera análoga pero al revés (los documentos son representados como vectores columna y los términos como vectores fila) } representan los \textbf{n} documentos; y el valor asignado a cada componente refleja la importancia o frecuencia ponderada que produce el término, frase o concepto $t_{i}$ en la representación semántica del documento \textit{j}.
+Cada documento\footnote{La query será tratada como un documento más cuando se considere pertinente para simplificar la implementación y la explicación.} puede ser escrito como:
+\begin{equation}\label{eq:1} d_{j} = \begin{bmatrix} w_1j \ w_2j \ \hdots \ w_mj \end{bmatrix} 
+\end{equation} 
+Donde \textbf{m} es la cardinalidad del conjunto de términos y cada $w_{ij}$ representa el peso del término $t_{i}$ en el documento $d_{j}$. En la práctica hay varias maneras de calcular estos pesos y hacer la matriz términos-documentos, esta implementación usará \textbf{TF-IDF}.
+\item \textbf{TF-IDF} (del ingles \textit{Term frequency-Inverse document frequency }) es una medida numérica que expresa que tan relevante es una palabra para un documento en un cuerpo de documentos. El valor del tfidf aumenta proporcionalmente al número de veces que una palabra aparece en el documento, pero es compensado por la frecuencia de la palabra en la colección de documentos lo que permite manejar el hecho de que algunas palabras son generalmente más comunes que otras. Además puede utilizarse exitosamente para el filtrado de las \textit{stop-words}\footnote{Esto será de utilidad en esta implementación para poder hacer una búsqueda basada en el peso de las palabras y no solo en su frecuencia absoluta.}
+(palabras que suelen usarse en casi todos los documentos). Tf-idf es el producto de dos medidas, frecuencia de término y frecuencia inversa del documento. Existen varias maneras de determinar el valor de ambas. 
+
+Para hallar la \textbf{frecuencia del término} tf(\textit{t},\textit{d}) la opción que se usará es la frecuencia absoluta del término \textit{t} en el documento \textit{d}, o sea el número de veces que el término \textit{t} ocurre en el documento \textit{d}. Si se denota la frecuencia absoluta de \textit{t} en el documento \textit{d} por f(\textit{t},\textit{d}), entonces:
+\begin{equation}
+\text{tf}(t,d) = \text{f}(t,d) 
+\end{equation}.
+
+La \textbf{frecuencia inversa del documento} es una medida de si el término es común o no, aunque hay varias maneras de calcularlo, esta implementación usará su expresión más sencilla:
+\begin{equation}
+\text{idf}(t,D) = \log \frac{N}{n_t} 
+\end{equation}
+Donde \textit{N} es la cantidad de documentos en el cuerpo de documentos y \textit{$n_t$} es la cantidad de documentos que contienen al término \textit{t}. Matemáticamente la base del logaritmo no es importante y constituye un factor constante en el resultado final.
+
+Finalmente \textit{tfidf} se calcula como:
+\begin{equation}
+\text{tfidf}(t,d,D) = \text{tf}(t,d) \times \text{idf}(t,D) 
+\end{equation} 
+Un peso alto en \textit{tfidf} se alcanza con una elevada frecuencia del término (en el documento dado) y una pequeña frecuencia del término en la colección completa de documentos. Además el valor de esta medida siempre es no negativo.
+\item La \textbf{similitud coseno} es una medida de similitud entre dos vectores no nulos, la usaré para calcular la similitud entre un documento y una consulta (representados como vectores por supuesto). Se puede hallar mediante la siguiente expresión:
+\begin{equation}
+ \text{cos}(v,w) = \frac{v \cdot w}{|v| |w|} 
+\end{equation}
+El numerador representa el producto punto entre los vectores \textit{v} y \textit{w} que se calcula mediante la siguiente fórmula:
+\begin{equation}
+v \cdot w = \sum_{i=1}^n v_i w_i
+\end{equation} 
+ 
+El denominador representa el producto entre los módulos de los vectores \textit{v} y \textit{w}. El módulo de un vector puede calcularse así:
+\begin{equation}
+\|v\| = \sqrt{\sum_{i=1}^n v_i^2}
+\end{equation}
+Donde los $v_{i}$ y $w_i$ representan las componentes del vector \textit{v} y \textit{w} respectivamente.
+
+Como los vectores documento tienen sus componentes no negativas la similitud coseno tendrá un valor no negativo. 
+\end{itemize}  
+A modo de resumen, los documentos pueden ser representados como vectores, cuyas entradas son los pesos de los términos del cuerpo de documentos. Para hallar esos pesos se puede usar la medida \textbf{TF-IDF}. Para calcular la similitud o \textit{puntaje de relevancia} entre un documento y la consulta se usa la \textbf{similitud coseno} entre los vectores que los representan\footnote{Resta ordenar en forma descendiente los \textit{puntajes de relevancia} calculados y se obtendrá el  \textit{orden de relevancia}.}. 
+\subsection{La implementación}
+El código principal de la "lógica" del buscador se encuentra en el archivo \textit{Moogle.cs}. Este archivo se divide en cuatro clases :  \class{Moogle}, \class{Documents}, \class{Query} y \class{Vector}. La estructura de cada clase es igual y sigue este orden:
+\begin{enumerate}
+\item Variables de instancia (o campos en el caso de la clase \class{Moogle}).
+\item Propiedades.
+\item Métodos.
+\end{enumerate}
+Los métodos que tienen un prefijo \texttt{Get} forman parte de la "lógica" de una propiedad, por lo que son ejecutados al instanciar cada clase (excepto en la clase \class{Moogle} por supuesto). Dicho esto se explicará el funcionamiento del código, explicando cada clase del archivo, así como los métodos y principales propiedades de cada clase.
+
+\textbf{\textit{Clases:}}
+\begin{itemize}
+\item \class{Documents} : se encarga de procesar un cuerpo de documentos con extensión \textit{.txt} dentro de un directorio.
+
+\textbf{\textit{Métodos:}}
+\begin{itemize}
+\item \texttt{Documents(\keyword{string} \texttt{DirRoute})}: es el constructor de la clase, toma como parámetro un \keyword{string} con la ruta del directorio que contiene el cuerpo de documentos. 
+\item \texttt{TokenizeDocument(\keyword{string} \texttt{DocRoute})} : toma la ruta de un documento y devuelve un \textit{array} de \keyword{string} con las palabras que conforman el documento sin símbolos extraños ni cadenas vacías.
+\item \texttt{ComputeDocTF()}: devuelve un diccionario donde cada clave es la ruta de cada uno de los archivos \textit{.txt} y cada valor es un  diccionario que tiene como
+claves las palabras (sin repetir) de su respectivo archivo y como valores sus respectivas frecuencias
+absolutas en él. Utiliza a \texttt{TokenizeDocument()} como un método auxiliar y a la propiedad \texttt{FilesRoutes} (Véase en la subsección de \textit{\textbf{Propiedades}}).
+\item \texttt{GetWordSet()} :  devuelve un \textit{array} de \keyword{string} con todos las palabras (sin repetición)o términos del cuerpo de documentos. Utiliza la estructura \class{HashSet} para una mayor eficiencia y la propiedad \texttt{DocTF} (derivada del método \texttt{ComputeDocTF()}).
+\item \texttt{GetTF()} : devuelve un \textit{array} bidimensional de \keyword{int} que representa la matriz \textbf{TF} del cuerpo de documentos, donde el elemento en la \textit{i}-ésima fila y la \textit{j}-ésima columna corresponde al tf del \textit{i}-ésimo término en el \textit{j}-ésimo documento. Utiliza la propiedad \texttt{DocTF} y la propiedad \texttt{WordSet} (derivada del método \texttt{GetWordSet()}).
+\item \texttt{GetIDF()} : devuelve un \textit{array} con los idf de cada término en el conjunto de documentos, donde el \textit{i}-ésimo elemento corresponde al idf del \textit{i}-ésimo término en el cuerpo de documentos. Utiliza la propiedad \texttt{TF} (derivada del método \texttt{GetTF()}).
+\item \texttt{GetTF\_IDF()} : devuelve un \textit{array} bidimensional de \keyword{double} que representa la matriz \textbf{TF-IDF} del cuerpo de documentos, donde el elemento en la \textit{i}-ésima fila y en la \textit{j}-ésima columna representa el tfidf del \textit{i}-ésimo termino en el \textit{j}-ésimo documento. Utiliza la propiedad \texttt{TF} y la propiedad \texttt{IDF} (derivada del método \texttt{GetIDF()}).
+\end{itemize}
+\textit{\textbf{Propiedades:}}
+\begin{itemize}
+\item \texttt{FilesRoutes}: \textit{array} de \keyword{string} con las rutas de los archivos \textit{.txt} contenidos en la carpeta cuya ruta fue pasada como parámetro en el constructor de la clase.
+\item \texttt{DocTF} : derivada del método \texttt{ComputeDocTF()}.
+\item \texttt{WordSet} : derivada del método \texttt{GetWordSet()}.
+\item \texttt{IDF} : derivada del método \texttt{GetIDF()}.
+\item \texttt{TF\_IDF} : derivada del método \texttt{GetTF\_IDF()}.
+\end{itemize}
+\item  \class{Query} : se encarga de procesar la consulta hecha por el usuario.
+
+\textit{\textbf{Métodos:}}
+\begin{itemize}
+\item \texttt{Query(\keyword{string} query, \keyword{string}[] WordSet, \keyword{double}[] IDF)} : es el constructor de la clase, recibe como primer parámetro un \keyword{string} con la consulta hecha por el usuario, como segundo un \textit{array} de \keyword{string} con el conjunto de palabras del cuerpo de documentos y como tercero un \textit{array} de \keyword{double} con el idf de cada término en el conjunto de documentos.
+\item \texttt{GetTokenizedQuery()}: devuelve un \textit{array} de \keyword{string} con las palabras que componen la consulta hecha por el usuario (pasada en el primer parámetro del constructor de la clase) sin símbolos extraños ni cadenas vacías.
+\item \texttt{GetTF()} : retorna un \textit{array} de \keyword{int} que representa la matriz \textbf{TF} de la consulta, donde el \textit{i}-ésimo elemento corresponde a la frecuencia absoluta del \textit{i}-ésimo término del cuerpo de documentos en la consulta (para esto utiliza el conjunto de palabras o términos pasado en el segundo parámetro del constructor de la clase).
+\item \texttt{GetTF\_IDF()} : retorna un \textit{array} de \keyword{double} que representa la matriz \textbf{TF-IDF}, donde el \textit{i}-ésimo elemento representa el tfidf del \textit{i}-ésimo término del conjunto de documentos en la consulta. Utiliza la propiedad \texttt{TF} (derivada del método \texttt{GetTF()}) y el \textit{array} pasado en el tercer parámetro del constructor de la clase.
+\end{itemize}
+\textbf{\textit{Propiedades:}}
+\begin{itemize}
+\item \texttt{TF\_IDF}: derivada del método \texttt{GetTF\_IDF()}.
+\end{itemize}
+\item \class{Vector} : crea un vector a partir de un \textit{array} numérico con sus componentes y define operaciones entre vectores.
+
+\textit{\textbf{Métodos:}}
+\begin{itemize}
+\item \texttt{Vector(\keyword{double}[] components)} : constructor de la clase, toma como único parámetro un \textit{array} de \keyword{double} con las componentes del vector.
+\item \texttt{GetModule()} : devuelve el módulo del vector, calculado a partir de sus componentes (pasadas como parámetro).
+\item \texttt{DotProduct(\class{Vector} v1, \class{Vector} v2)} : método estático que toma como parámetros dos vectores y devuelve un \keyword{double} que \mbox{representa} su producto punto a partir de sus componentes (pasadas como parámetro).
+\item \texttt{Cos(\class{Vector} v1, \class{Vector} v2)} : Devuelve un \keyword{double} que representa el coseno entre dos vectores si ambos tienen módulos distintos de cero y \textbf{0} si alguno tiene el módulo igual a cero. Utiliza la propiedad \texttt{Module} (derivada del método \texttt{GetModule()}) y el método \texttt{DotProduct(...)}.
+\end{itemize}
+\item \class{Moogle} : clase estática que se encarga de realizar consultas sobre el cuerpo de documentos(los archivos con extensión \textit{.txt} que se encuentran en la carpeta \textit{Content}).
+
+\textit{\textbf{Propiedades}}:
+\begin{itemize}
+\item \texttt{initDocs()} : inicializa el campo \texttt{documents}, que es una instancia de la clase \class{Documents}, con la ruta de la carpeta \textit{Content}. Es ejecutado mientras se renderiza la interfaz gráfica.
+\item \texttt{ExtractText(\keyword{string} filePath, \keyword{string} query)}:extrae un fragmento de texto de un documento que contenga alguna de las palabras de la consulta, y lo devuelve como un \keyword{string}. Si no hay ninguna coincidencia, devuelve un mensaje indicándolo. Utiliza expresiones regulares.
+\item \texttt{GetScores(\class{Query} userInp)}: devuelve un \textit{array} de \keyword
+{double} donde el \textit{i}-ésimo elemento corresponde al puntaje de relevancia o score de la query con el \textit{i}-ésimo documento. Para ello utiliza la propiedad \texttt{TF\_IDF} de los objetos \texttt{documents} y \texttt{userInp} y el método estático \texttt{Cos(...)} de la clase \class{Vector}.
+\item \texttt{GetResults(\keyword{double}[] scores)} devuelve un \textit{array} de \keyword{string} donde al \textit{i}-ésimo elemento le corresponde la ruta del \textit{i}-ésimo documento. Para esto utiliza la propiedad \texttt{DocTF} de \texttt{documents}.
+\item \texttt{Query(\keyword{string} query)}: recibe la consulta hecha por el usuario y devuelve un objeto del tipo \class{SearchResult} que contiene a la consulta y a un \textit{array} con objetos del tipo \class{SearchItem}, cada uno con el nombre del documento, un fragmento de ese documento o snnipet y un score o puntaje de coincidencia, ordenados de mayor a menor por el score.
+Para esto:
+\begin{enumerate}
+\item Se instancia el objeto \text{userInp} de la clase \class{Query}.
+\item Se calculan los scores usando el método \texttt{GetScores(...)} y se almacenan en la variable \texttt{scores}.
+\item Se crea una variable \texttt{positiveScores} que almacena los scores positivos.
+\item Se almacenan en la variable \texttt{results} usando el método \texttt{GetResults(...)} las rutas de los documentos.
+\item Se llama al método estático \texttt{Sort(...)}de la clase \class{Array} para ordenar el \textit{array} \texttt{results} respecto al \textit{array} \texttt{scores} de menor a mayor y luego al método estático \texttt{Reverse(...)} de la misma clase con cada \textit{array} para que se ordenen de mayor a menor.
+\item Se crea un \textit{array} de \class{SearchItems}, \texttt{items} que guarda los objetos cada del tipo \class{SearchItem} con un score positivo, usando un ciclo que se detiene cuando ya no hay más scores no nulos.
+\item Se retorna un objeto instanciado de \class{SearchResult} con el \textit{array} \texttt{items} y el \keyword{string} \texttt{query}.
+\end{enumerate}
+Así se tienen los documentos que coinciden con la consulta ordenados de más relevante a menos relevante con sus respectivos snippets. 
+\end{itemize} 
+\end{itemize}
+\section{Conclusiones} En este informe se ha presentado el diseño e implementación de \textbf{Moogle!}, un motor de búsqueda sencillo pero eficaz que utiliza el \textbf{Modelo de Espacio Vectorial} para ordenar los documentos más relevantes para una consulta dada. Se han explicado sus fundamentos matemáticos, así como el código empleado para su realización en \textbf{C\#}. Se ha demostrado que el motor de búsqueda es capaz de procesar consultas sobre un conjunto de archivos de texto y devolver los resultados ordenados por su similitud con la consulta, utilizando medidas como el producto escalar, la distancia euclidiana y el coseno del ángulo entre dos vectores. Se concluye que \textbf{Moogle!} es un proyecto didáctico que ilustra los principios básicos de la recuperación de información y que ofrece una experiencia de búsqueda satisfactoria al usuario.
+\end{document}
+
