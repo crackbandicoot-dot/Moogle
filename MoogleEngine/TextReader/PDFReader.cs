@@ -10,37 +10,35 @@ using System.Text.RegularExpressions;
 using UglyToad.PdfPig;
 using UglyToad.PdfPig.Content;
 
-namespace MoogleEngine.DocumentsUtils
+namespace MoogleEngine.TextReader
 {
-    class PDFReader : IDocumentReader, IDisposable
+    class PDFReader : ITextReader, IDisposable
     {
-        private int currentPageNumber;
         private PdfDocument pdfDocument;
         private bool disposed = false;
 
         public PDFReader(string path)
         {
             pdfDocument = PdfDocument.Open(path);
-            currentPageNumber = 1;
             DocumentPath = path;
         }
 
         public string DocumentPath { get; }
 
-        public bool EndOfDocument()
+        
+        public bool ValidPage(int pageNumber)
         {
-            return currentPageNumber > pdfDocument.NumberOfPages;
+            return 1<=pageNumber && pageNumber <= pdfDocument.NumberOfPages;
         }
-
-        public string ReadPage()
+        public string ReadPage(int pageNumber)
         {
-            if (EndOfDocument())
+            if (!ValidPage(pageNumber))
                 return "";
 
             string pageContent = "";
             try
             {
-                var page = pdfDocument.GetPage(currentPageNumber);
+                var page = pdfDocument.GetPage(pageNumber);
                 pageContent = string.Join(" ", page.GetWords().Select(w => w.Text));
 
                 // Remove numbers, symbols, and non-alphabetic characters
@@ -51,10 +49,6 @@ namespace MoogleEngine.DocumentsUtils
             catch (Exception)
             {
                 // Fallback: Return empty string on failure
-            }
-            finally
-            {
-                currentPageNumber++;
             }
             return pageContent;
         }

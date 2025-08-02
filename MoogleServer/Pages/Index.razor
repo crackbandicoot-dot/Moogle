@@ -22,8 +22,8 @@
     @foreach (var item in result.Items()) {
         <li>
             <div class="item">
-                <a class="title" href="@($"file:///{Moogle.Settings.DataBasePath}/{item.Title}")"> @item.Title</a>
-                <p><b>@($"Page: {item.PageNumber}")</b></p>
+                <a class="title" href="@($"file:///{item.Title}")"> @Path.GetFileName(item.Title)</a>
+                <p><b>@($"Pages: {string.Join(",",item.RelevantPages)}")</b></p>
                 <p> ...@item.Snippet ...</p>
             </div>
         </li>

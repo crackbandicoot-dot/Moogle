@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using MoogleEngine.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
 

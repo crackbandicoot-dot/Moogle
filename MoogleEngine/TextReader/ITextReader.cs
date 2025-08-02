@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MoogleEngine.DocumentsUtils
+namespace MoogleEngine.TextReader
 {
-    public interface IDocumentReader
+    public interface ITextReader
     {
         string DocumentPath { get; }
-        bool EndOfDocument();
-        string ReadPage();
+        bool ValidPage(int pageNumber);
+        string ReadPage(int pageNumber);
     }
 }

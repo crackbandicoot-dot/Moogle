@@ -1,8 +1,7 @@
 ﻿{
   "AppConfig": {
-    "DataBasePath": "C:\\Users\\CHRIS\\Desktop\\QuickAcces\\Diary",
-    "NumbersOfResultsShowed": 10,
-    "MinimumScoreLength": 0.1
+    "DataBasePath": "C:\\Users\\CHRIS\\Desktop\\QuickAcces",
+    "NumbersOfResultsShowed": 60
   }
 
 }

@@ -1,19 +1,25 @@
 ﻿// Ignore Spelling: IDF
 
+using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
-using System.IO;
 using Microsoft.Extensions.Configuration;
 using MoogleEngine.DocumentsUtils;
-using MoogleEngine.ExtensorMethods;
+using MoogleEngine.SearchEngine;
+using MoogleEngine.TextReader;
+using MoogleEngine.Utils;
+using UglyToad.PdfPig.Content;
 namespace MoogleEngine;
 
 
 public static class Moogle
 {
   
-    private static DocumentsPagesStatistics documents;
+    private static TextCorpus.VectorizedTextCorpus textCorpus;
 
-    public static AppConfig Settings;
+    public static AppConfig.AppConfig Settings;
+
+    private static ITextReaderFactory readerFactory;
     public static void initDocs()
     {
         
@@ -22,77 +28,65 @@ public static class Moogle
             .Build();
 
         // Bind configuration to class
-        Settings = config.GetSection("AppConfig").Get<AppConfig>() ?? throw new Exception("Configuration missing!");
+        Settings = config.GetSection("AppConfig").Get<AppConfig.AppConfig>() ?? throw new Exception("Configuration missing!");
         string path = Path.GetFullPath(Settings.DataBasePath);
-        documents = new DocumentsPagesStatistics(path);
+        textCorpus = new TextCorpus.VectorizedTextCorpus(path);
+        readerFactory = new TextReaderFactory();
     }
 
     public static SearchResult Query(string query)
     {
-        
-        Query userInp = new Query(query, documents.WordSet.ToArray(), documents.IDF);
-        double[] scores = GetScores(userInp);
-        double[] validScores = scores.Where(x => x > Settings.MinimumScoreLength).ToArray();
-        string[] results = GetResults(scores);
-        int[] pages = GetPages(scores);
-        Array.Sort(scores, results);
-        Array.Sort(scores, pages);
-        Array.Reverse(results);
-        Array.Reverse(scores);
-        Array.Reverse(pages);
-        int numberOfItemsToDisplay = Math.Min(Settings.NumbersOfResultsShowed, validScores.Length);
-        SearchItem[] items = new SearchItem[numberOfItemsToDisplay];
-        for (int i = 0; i < numberOfItemsToDisplay; i++)
-        {
-            items[i] = new SearchItem(Path.GetFileName(results[i]), ExtractText(results[i],query), (float)scores[i], pages[i]);
-        }
-        return new SearchResult(items, query);
 
-    }
-    public static int[] GetPages(double[] scores)
-    {
-        List<int> pages = new();
-        foreach (var page in documents.SplicedDocuments)
+        ISearchEngine searchEngine = new SearchEngine.SearchEngine();
+        var results = searchEngine.Search(new MoogleEngine.ProcessedQuery.Query(query),textCorpus);
+        
+        SimpleDictionary<string, List<int>> textPages = new();
+        SimpleDictionary<string, string> textSnippets = new();
+
+        int pagesToShow = Math.Min(results.Count, Settings.NumbersOfResultsShowed);
+        for (int p = 0; p < pagesToShow; p++)
         {
-            pages.Add(page.PageNumber);
-        }
-        return pages.ToArray();
-    }
-    public static double[] GetScores(Query userInp)
-    {
-        double[] result = new double[documents.TF_IDF.GetLength(1)];
-        Vector queryVector = new Vector(userInp.TF_IDF);
-        for (int i = 0; i < documents.TF_IDF.GetLength(1); i++)
-        {
-            double[] doc = new double[documents.TF_IDF.GetLength(0)];
-            for (int j = 0; j < documents.TF_IDF.GetLength(0); j++)
+            var x = results.Dequeue();
+            var page = x.Page; 
+            var score = x.Score;
+            
+            if (textPages[page.PathToDocument] == null)
             {
-                doc[j] = documents.TF_IDF[j, i];
+                    textPages[page.PathToDocument] = [];
+
+                    textSnippets[page.PathToDocument] =
+                        ExtractText(page.PathToDocument, query, page.PageNumber);
+
             }
-            Vector docVecor = new Vector(doc);
-            result[i] = Vector.Cos(queryVector, docVecor);
-        }
-        return result;
-    }
-    public static string[] GetResults(double[] scores)
-    {
-        List<string> results = new List<string>();
-        foreach (var page in documents.SplicedDocuments)
+
+            textPages[page.PathToDocument]
+               .Add(page.PageNumber);
+            
+        }      
+        SearchItem[] items = new SearchItem[textPages.Count];
+        int itemsIndex = 0;
+        foreach (var title in textPages.Keys)
         {
-            results.Add(page.OriginalDocumentPath);
+            items[itemsIndex] = new SearchItem(title, textSnippets[title].ToString(), textPages[title]);
+            itemsIndex++;
+            
         }
-        return results.ToArray();
+        return new SearchResult(items);
     }
-    public static string ExtractText(string filePath, string query)
+    
+    
+    
+    public static string ExtractText(string filePath, string query,int pageNumber)
     {
-        if (!filePath.EndsWith("txt"))
-        {
-            return "...[Too large Document]...";
-        }
-        string text = File.ReadAllText(filePath);
+        
+        var reader = readerFactory.CreateReader(filePath);
+        
+        string text = reader.ReadPage(pageNumber);
+        
         string[] words = query.Split(' ');
         int start = -1;
         int end = -1;
+        int snippetLength=50;
         foreach (string word in words)
         {
             string pattern = $"(?i){Regex.Escape(word)}";
@@ -102,19 +96,19 @@ public static class Moogle
                 int index = match.Index;
                 if (start == -1 || index < start)
                 {
-                    start = Math.Max(0, index - 50);
+                    start = Math.Max(0, index - snippetLength/2);
                 }
                 if (end == -1 || index + match.Length > end)
                 {
-                    end = Math.Min(text.Length - 1, index + match.Length + 50);
+                    end = Math.Min(text.Length - 1, index + match.Length + snippetLength/2);
                 }
             }
         }
         if (start == -1 || end == -1)
         {
-            return "No se encontró ninguna coincidencia.";
+            return "...";
         }
-        return text.Substring(start, end - start);
+        return text[start..end];
     }
 }
 

@@ -6,12 +6,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MoogleEngine.DocumentsUtils
+namespace MoogleEngine.TextReader
 {
-    class TXTReader : IDocumentReader
+    class TXTReader : ITextReader
     {
 
-        private bool read;
      
         public string DocumentPath { get; }
 
@@ -21,14 +20,17 @@ namespace MoogleEngine.DocumentsUtils
 
         }
         
-        public bool EndOfDocument()
+        public bool ValidPage(int pageNumber)
         {
-            return read;
+            return pageNumber == 1;
         }
 
-        public string ReadPage()
+        public string ReadPage(int pageNumber)
         {
-            read = true;
+            if (!ValidPage(pageNumber))
+            {
+                return "";
+            }
             return File.ReadAllText(DocumentPath);
         }
     }
