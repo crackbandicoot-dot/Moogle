@@ -16,7 +16,13 @@ namespace MoogleEngine.Utils
         public static TextCorpus.TextCorpus DeserializeOrCreate(string dirRoute)
         {
             TextCorpus.TextCorpus textCorpus;
-            string jsonString = File.ReadAllText(_cachePath);
+            string jsonString = "";
+            try
+            {
+                jsonString = File.ReadAllText(_cachePath);
+            }
+            catch { }
+
             if (string.IsNullOrEmpty(jsonString))
             {
                 textCorpus = new(dirRoute);
