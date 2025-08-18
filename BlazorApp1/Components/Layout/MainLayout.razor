@@ -1,0 +1,152 @@
+@*
+    File: MainLayout.razor
+    Component: UI Components
+*@
+
+@inherits LayoutComponentBase
+@using Shared
+@inject ISearchService SearchService
+@inject IConfigurationService ConfigService
+
+<div class="page">
+    <main>
+        <div class="top-row px-4">
+            <button class="btn btn-secondary" @onclick="ShowConfigurationForm">Configuration</button>
+        </div>
+
+        <article class="content px-4">
+            <SearchPage OnDocumentOpenRequested="HandleDocumentOpenRequested" />
+            <hr />
+            <TabbedView 
+                Tabs="_openTabs" 
+                ActiveTab="_activeTab" 
+                OnTabSelected="HandleTabSelected" 
+                OnTabClosed="HandleTabClosed" />
+        </article>
+    </main>
+</div>
+
+@if (_showConfiguration)
+{
+    <div class="modal-backdrop">
+        <div class="modal-content">
+            <Configuration Config="_configForEditing" OnSave="HandleConfigurationSave" OnCancel="HandleConfigurationCancel" />
+        </div>
+    </div>
+}
+
+
+@code {
+    private List<Document> _openTabs = new();
+    private Document? _activeTab;
+    private bool _showConfiguration = false;
+    private SearchConfiguration _configForEditing = new();
+
+    /// <summary>
+    /// Handles the request to open a new document tab.
+    /// </summary>
+    /// <param name="documentId">The ID of the document to open.</param>
+    private async Task HandleDocumentOpenRequested(string documentId)
+    {
+        // 1. Check if a tab for this documentId already exists in _openTabs.
+        var existingTab = _openTabs.FirstOrDefault(t => t.Id == documentId);
+
+        if (existingTab != null)
+        {
+            // 2. If it exists, set _activeTab to the existing tab.
+            _activeTab = existingTab;
+        }
+        else
+        {
+            // 3. If it does not exist:
+            // a. Call SearchService.GetDocumentByIdAsync(documentId) to fetch the document.
+            var newDocument = await SearchService.GetDocumentByIdAsync(documentId);
+            
+            // b. If the document is not null, add it to the _openTabs list.
+            if (newDocument != null)
+            {
+                _openTabs.Add(newDocument);
+                // c. Set _activeTab to the newly added document.
+                _activeTab = newDocument;
+            }
+        }
+
+        // 4. Call StateHasChanged() to update the UI.
+        StateHasChanged();
+    }
+
+    /// <summary>
+    /// Sets the currently active tab when a user clicks on a tab header.
+    /// </summary>
+    /// <param name="selectedTab">The tab that was selected.</param>
+    private void HandleTabSelected(Document selectedTab)
+    {
+        // 1. Set the _activeTab field to the 'selectedTab'.
+        _activeTab = selectedTab;
+    }
+
+    /// <summary>
+    /// Closes a document tab and updates the active tab if necessary.
+    /// </summary>
+    /// <param name="tabToClose">The tab to be closed.</param>
+    private void HandleTabClosed(Document tabToClose)
+    {
+        // 1. Remove 'tabToClose' from the _openTabs list.
+        _openTabs.Remove(tabToClose);
+
+        // 2. Check if the closed tab was the active tab (_activeTab).
+        if (_activeTab == tabToClose)
+        {
+            // 3. If it was, set the new _activeTab to be the last tab in the list, or null if the list is now empty.
+            _activeTab = _openTabs.LastOrDefault();
+        }
+    }
+
+    /// <summary>
+    /// Prepares and displays the configuration form.
+    /// </summary>
+    private async Task ShowConfigurationForm()
+    {
+        // 1. Load the current configuration using ConfigService.LoadConfigurationAsync().
+        var currentConfig = await ConfigService.LoadConfigurationAsync();
+
+        // 2. Create a new SearchConfiguration object and copy the properties from the loaded config.
+        // 3. Assign this new object to _configForEditing.
+        _configForEditing = new SearchConfiguration
+        {
+            ResultsPerPage = currentConfig.ResultsPerPage,
+            SnippetLength = currentConfig.SnippetLength,
+            Theme = currentConfig.Theme,
+            SearchIndexPath = currentConfig.SearchIndexPath
+        };
+
+        // 4. Set _showConfiguration to true.
+        _showConfiguration = true;
+    }
+
+    /// <summary>
+    /// Saves the modified configuration and closes the form.
+    /// </summary>
+    /// <param name="newConfig">The configuration object with the new settings from the form.</param>
+    private async Task HandleConfigurationSave(SearchConfiguration newConfig)
+    {
+        // 1. Call ConfigService.SaveConfigurationAsync(newConfig).
+        await ConfigService.SaveConfigurationAsync(newConfig);
+        
+        // 2. Set _showConfiguration to false.
+        _showConfiguration = false;
+        
+        // Note: For the changes to take effect immediately on the search page,
+        // we would need to either force a reload or pass the new config down.
+        // For simplicity, we'll require a page refresh.
+    }
+
+    /// <summary>
+    /// Hides the configuration form without saving changes.
+    /// </summary>
+    private void HandleConfigurationCancel()
+    {
+        // 1. Set _showConfiguration to false.
+        _showConfiguration = false;
+    }
+}

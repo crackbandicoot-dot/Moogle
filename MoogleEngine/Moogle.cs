@@ -9,32 +9,35 @@ using MoogleEngine.SearchEngine;
 using MoogleEngine.TextReader;
 using MoogleEngine.Utils;
 using UglyToad.PdfPig.Content;
+using Shared;
+
 namespace MoogleEngine;
 
 
-public static class Moogle
+public class Moogle :ISearchService
 {
-  
-    private static TextCorpus.VectorizedTextCorpus textCorpus;
 
-    public static AppConfig.AppConfig Settings;
+    private TextCorpus.VectorizedTextCorpus textCorpus;
+
+    private AppConfig.AppConfig settings;
 
     private static ITextReaderFactory readerFactory;
-    public static void initDocs()
+    
+    public Moogle()
     {
-        
-        IConfiguration config = new ConfigurationBuilder()
-            .AddJsonFile("appconfig.json")
-            .Build();
+        //IConfiguration config = new ConfigurationBuilder()
+        //    .AddJsonFile("appconfig.json")
+        //    .Build();
 
-        // Bind configuration to class
-        Settings = config.GetSection("AppConfig").Get<AppConfig.AppConfig>() ?? throw new Exception("Configuration missing!");
-        string path = Path.GetFullPath(Settings.DataBasePath);
-        textCorpus = new TextCorpus.VectorizedTextCorpus(path);
-        readerFactory = new TextReaderFactory();
+        //// Bind configuration to class
+        //settings = config.GetSection("AppConfig").Get<AppConfig.AppConfig>() ?? throw new Exception("Configuration missing!");
+        //string path = Path.GetFullPath(settings.DataBasePath);
+        //textCorpus = new TextCorpus.VectorizedTextCorpus(path);
+        //readerFactory = new TextReaderFactory();
     }
+    
 
-    public static SearchResult Query(string query)
+    public SearchResult Query(string query)
     {
 
         ISearchEngine searchEngine = new SearchEngine.SearchEngine();
@@ -43,7 +46,7 @@ public static class Moogle
         SimpleDictionary<string, List<int>> textPages = new();
         SimpleDictionary<string, string> textSnippets = new();
 
-        int pagesToShow = Math.Min(results.Count, Settings.NumbersOfResultsShowed);
+        int pagesToShow = Math.Min(results.Count, settings.NumbersOfResultsShowed);
         for (int p = 0; p < pagesToShow; p++)
         {
             var x = results.Dequeue();
@@ -109,6 +112,30 @@ public static class Moogle
             return "...";
         }
         return text[start..end];
+    }
+
+    public Task<List<Shared.SearchResult>> SearchAsync(string query, int pageNumber, int resultsPerPage)
+    {
+        return Task.FromResult(new List<Shared.SearchResult>
+        {
+            new Shared.SearchResult
+            {
+                DocumentId = "1",
+                Title = "Sample Document",
+                Snippet = "This is a sample snippet from the document."
+            }
+        });
+    }
+
+    public Task<Shared.Document> GetDocumentByIdAsync(string documentId)
+    {
+        // Basic test implementation: returns a dummy document
+        return Task.FromResult(new Shared.Document
+        {
+            Id = documentId,
+            Title = "Test Document",
+            Content = "This is the full content of the test document."
+        });
     }
 }
 

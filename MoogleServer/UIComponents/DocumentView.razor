@@ -1,0 +1,32 @@
+@*
+    File: DocumentView.razor
+    Component: UI Components
+*@
+
+@using Shared
+@using Microsoft.AspNetCore.Components
+
+<div class="document-view-container">
+    @if (Document != null)
+    {
+        <h1 class="document-title">@Document.Title</h1>
+        <hr />
+        <div class="document-content">
+            @((MarkupString)Document.Content.Replace("\n", "<br />"))
+        </div>
+    }
+    else
+    {
+        <p>No document is currently loaded.</p>
+    }
+</div>
+
+@code {
+    /// <summary>
+    /// The full document object to be displayed by this component.
+    /// The parent component (e.g., a tab) is responsible for providing this data.
+    /// This parameter is required for the component to render content.
+    /// </summary>
+    [Parameter, EditorRequired]
+    public Document Document { get; set; } = new();
+}
