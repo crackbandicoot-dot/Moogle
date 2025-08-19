@@ -19,9 +19,9 @@
         }
 
         <div class="pagination-controls">
-            <button @onclick="() => ChangePage(CurrentPage - 1)" disabled="@(CurrentPage <= 1)">Previous</button>
+            <button @onclick="() => ChangePage(CurrentPage - 1)">Previous</button>
             <span>Page @CurrentPage of @TotalPages</span>
-            <button @onclick="() => ChangePage(CurrentPage + 1)" disabled="@(CurrentPage >= TotalPages)">Next</button>
+            <button @onclick="() => ChangePage(CurrentPage + 1)">Next</button>
         </div>
     }
 </div>

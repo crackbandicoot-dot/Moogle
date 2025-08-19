@@ -14,9 +14,9 @@ namespace MoogleEngine.AppConfig
             // Return a default SearchConfiguration for testing purposes
             var config = new SearchConfiguration
             {
-                ResultsPerPage = 10,
-                SnippetLength = 150,
-                Theme = "Light",
+                ResultsPerPage = 2,
+                SnippetLength = 400,
+                Theme = "Dark",
                 SearchIndexPath = "test-index.json"
             };
             return Task.FromResult(config);

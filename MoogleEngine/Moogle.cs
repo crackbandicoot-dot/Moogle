@@ -16,7 +16,9 @@ namespace MoogleEngine;
 
 public class Moogle :ISearchService
 {
+    private List<SearchItem> _lastQueryResult;
 
+    private string _lastQuery;
     private TextCorpus.VectorizedTextCorpus textCorpus;
 
     private AppConfig.AppConfig settings;
@@ -25,15 +27,15 @@ public class Moogle :ISearchService
     
     public Moogle()
     {
-        //IConfiguration config = new ConfigurationBuilder()
-        //    .AddJsonFile("appconfig.json")
-        //    .Build();
+        IConfiguration config = new ConfigurationBuilder()
+            .AddJsonFile("appconfig.json")
+            .Build();
 
-        //// Bind configuration to class
-        //settings = config.GetSection("AppConfig").Get<AppConfig.AppConfig>() ?? throw new Exception("Configuration missing!");
-        //string path = Path.GetFullPath(settings.DataBasePath);
-        //textCorpus = new TextCorpus.VectorizedTextCorpus(path);
-        //readerFactory = new TextReaderFactory();
+        // Bind configuration to class
+        settings = config.GetSection("AppConfig").Get<AppConfig.AppConfig>() ?? throw new Exception("Configuration missing!");
+        string path = Path.GetFullPath(settings.DataBasePath);
+        textCorpus = new TextCorpus.VectorizedTextCorpus(path);
+        readerFactory = new TextReaderFactory();
     }
     
 
@@ -75,6 +77,7 @@ public class Moogle :ISearchService
             
         }
         return new SearchResult(items);
+
     }
     
     
@@ -116,15 +119,22 @@ public class Moogle :ISearchService
 
     public Task<List<Shared.SearchResult>> SearchAsync(string query, int pageNumber, int resultsPerPage)
     {
-        return Task.FromResult(new List<Shared.SearchResult>
+        var searchResult = new List<SearchItem>();
+        if (_lastQuery == query)
         {
-            new Shared.SearchResult
-            {
-                DocumentId = "1",
-                Title = "Sample Document",
-                Snippet = "This is a sample snippet from the document."
-            }
-        });
+            searchResult = _lastQueryResult;
+        }
+        else
+        {
+            _lastQuery = query;
+            _lastQueryResult = searchResult = Query(query).Items().ToList();
+        }
+        var ans = new List<Shared.SearchResult>();
+        for (int i = pageNumber * resultsPerPage; i < Math.Min(searchResult.Count, (pageNumber + 1) * resultsPerPage); i++)
+        {
+            ans.Add(new Shared.SearchResult() { DocumentId = searchResult[i].Title, Title = searchResult[i].Title, Snippet = searchResult[i].Snippet });
+        }
+        return Task.FromResult(ans);
     }
 
     public Task<Shared.Document> GetDocumentByIdAsync(string documentId)

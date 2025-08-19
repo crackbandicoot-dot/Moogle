@@ -8,13 +8,14 @@
 @using Shared;
 @inject ISearchService SearchService
 @inject IConfigurationService ConfigService
+@inject IJSRuntime JS
 
-<div class="page">
-    <main>
-        <button type="image" @onclick="ShowConfigurationForm">
-            <img src="/config-icon.png" width="50" height="50" alt="Config">
+<div >
+    <main class="container">
+        <button class="position-fixed top-0 end-0 m-3" style="background: transparent; border: none; padding: 0;" type="button" @onclick="ShowConfigurationForm">
+            <img src="/config-icon.ico" width="50" height="50" alt="Config">
         </button>
-            <SearchPage OnDocumentOpenRequested="HandleDocumentOpenRequested" />
+        <SearchPage OnDocumentOpenRequested="HandleDocumentOpenRequested" />
             <TabbedView 
                 Tabs="_openTabs" 
                 ActiveTab="_activeTab" 
@@ -24,6 +25,7 @@
             <hr />
     </main>
 </div>
+
 
 @if (_showConfiguration)
 {
@@ -47,33 +49,29 @@
     /// <param name="documentId">The ID of the document to open.</param>
     private async Task HandleDocumentOpenRequested(string documentId)
     {
-        // 1. Check if a tab for this documentId already exists in _openTabs.
-        var existingTab = _openTabs.FirstOrDefault(t => t.Id == documentId);
-
-        if (existingTab != null)
+        try
         {
-            // 2. If it exists, set _activeTab to the existing tab.
-            _activeTab = existingTab;
-        }
-        else
-        {
-            // 3. If it does not exist:
-            // a. Call SearchService.GetDocumentByIdAsync(documentId) to fetch the document.
-            var newDocument = await SearchService.GetDocumentByIdAsync(documentId);
-            
-            // b. If the document is not null, add it to the _openTabs list.
-            if (newDocument != null)
+            // Use Process.Start to open the file with the default application.
+            // This will open the file in the default browser if it's an HTML, PDF, etc.,
+            // or the relevant application for other file types.
+            new System.Diagnostics.Process
             {
-                _openTabs.Add(newDocument);
-                // c. Set _activeTab to the newly added document.
-                _activeTab = newDocument;
-            }
+                StartInfo = new System.Diagnostics.ProcessStartInfo(documentId)
+                {
+                    UseShellExecute = true
+                }
+            }.Start();
+        }
+        catch (Exception ex)
+        {
+            // Handle exceptions, e.g., file not found, no application associated with the file type.
+            Console.WriteLine($"Error opening file: {ex.Message}");
         }
 
-        // 4. Call StateHasChanged() to update the UI.
+        // Call StateHasChanged() to update the UI if needed.
         StateHasChanged();
+        await Task.CompletedTask;
     }
-
     /// <summary>
     /// Sets the currently active tab when a user clicks on a tab header.
     /// </summary>

@@ -1,6 +1,7 @@
 using MoogleUI.Components;
 using Shared;
 using MoogleEngine;
+using Microsoft.JSInterop;
 namespace MoogleUI
 {
     public class Program
@@ -10,6 +11,8 @@ namespace MoogleUI
             var builder = WebApplication.CreateBuilder(args);
             builder.Services.AddSingleton<ISearchService, Moogle>();
             builder.Services.AddSingleton<IConfigurationService, MoogleEngine.AppConfig.ConfigurationService>();
+            
+
             // Add services to the container.
             builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 
