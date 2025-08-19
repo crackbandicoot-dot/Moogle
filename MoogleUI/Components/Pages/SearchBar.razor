@@ -7,7 +7,7 @@
 @using Microsoft.AspNetCore.Components.Web
 
 <div class="search-bar-container">
-    <input type="text" class="search-input" placeholder="Enter your search query..." @bind="_searchQuery" @onkeyup="HandleKeyUp" />
+    <input type="text" class="search-input" placeholder="Enter your search query..." @bind="_searchQuery" />
     <button class="search-button" @onclick="SubmitSearch">Search</button>
 </div>
 
@@ -42,20 +42,5 @@
         return Task.CompletedTask;
     }
 
-    /// <summary>
-    /// Handles the key up event on the search input.
-    /// If the user presses the "Enter" key, it triggers the search submission.
-    /// </summary>
-    /// <param name="e">The keyboard event arguments.</param>
-    /// <returns>A Task representing the asynchronous operation.</returns>
-    private Task HandleKeyUp(KeyboardEventArgs e)
-    {
-        // 1. Check if the key pressed was the "Enter" key (e.Key == "Enter").
-        if (e.Key == "Enter")
-        {
-            // 2. If it was, call the SubmitSearch() method.
-            return SubmitSearch();
-        }
-        return Task.CompletedTask;
-    }
+   
 }

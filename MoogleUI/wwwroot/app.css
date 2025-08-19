@@ -48,4 +48,38 @@ h1:focus {
 
 .darker-border-checkbox.form-check-input {
     border-color: #929292;
+   
 }
+
+.page-title {
+  
+  
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 4rem;
+        font-weight: bold;
+        letter-spacing: -2px;
+        color: #4285F4;
+        display: inline-block;
+        line-height: 1.1;
+        margin-bottom: 1.5rem;
+    }
+
+    .page-title m {
+        color: #34A853;
+    }
+
+    .page-title o {
+        color: #EA4335;
+    }
+
+    .page-title g {
+        color: #EA4335;
+    }
+
+    .page-title l {
+        color: #34A853;
+    }
+
+    .page-title e {
+        color: #EA4335;
+    }

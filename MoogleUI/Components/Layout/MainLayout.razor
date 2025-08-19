@@ -1,28 +1,27 @@
-﻿@*
+@*
     File: MainLayout.razor
     Component: UI Components
 *@
-@inherits LayoutComponentBase
-@using Shared
 
+@inherits LayoutComponentBase
+@using MoogleUI.Components.Pages
+@using Shared;
+@inject ISearchService SearchService
+@inject IConfigurationService ConfigService
 
 <div class="page">
     <main>
-        <div class="top-row px-4">
-            <button class="btn btn-secondary" @onclick="ShowConfigurationForm">Configuration</button>
-            <button @onclick="Click">CLIKME</button>
-        </div>
-
-        <article class="content px-4">
+        <button type="image" @onclick="ShowConfigurationForm">
+            <img src="/config-icon.png" width="50" height="50" alt="Config">
+        </button>
             <SearchPage OnDocumentOpenRequested="HandleDocumentOpenRequested" />
-            <hr />
             <TabbedView 
                 Tabs="_openTabs" 
                 ActiveTab="_activeTab" 
                 OnTabSelected="HandleTabSelected" 
                 OnTabClosed="HandleTabClosed" />
-                
-        </article>
+           
+            <hr />
     </main>
 </div>
 
@@ -37,14 +36,11 @@
 
 
 @code {
-
     private List<Document> _openTabs = new();
     private Document? _activeTab;
     private bool _showConfiguration = false;
     private SearchConfiguration _configForEditing = new();
 
-    private ISearchService SearchService = new MoogleEngine.Moogle();
-    private IConfigurationService ConfigService = new MoogleEngine.AppConfig.ConfigurationService();
     /// <summary>
     /// Handles the request to open a new document tab.
     /// </summary>
@@ -64,7 +60,7 @@
             // 3. If it does not exist:
             // a. Call SearchService.GetDocumentByIdAsync(documentId) to fetch the document.
             var newDocument = await SearchService.GetDocumentByIdAsync(documentId);
-
+            
             // b. If the document is not null, add it to the _openTabs list.
             if (newDocument != null)
             {
@@ -104,6 +100,7 @@
             _activeTab = _openTabs.LastOrDefault();
         }
     }
+
     /// <summary>
     /// Prepares and displays the configuration form.
     /// </summary>
@@ -134,10 +131,10 @@
     {
         // 1. Call ConfigService.SaveConfigurationAsync(newConfig).
         await ConfigService.SaveConfigurationAsync(newConfig);
-
+        
         // 2. Set _showConfiguration to false.
         _showConfiguration = false;
-
+        
         // Note: For the changes to take effect immediately on the search page,
         // we would need to either force a reload or pass the new config down.
         // For simplicity, we'll require a page refresh.
@@ -151,9 +148,4 @@
         // 1. Set _showConfiguration to false.
         _showConfiguration = false;
     }
-    public void Click()
-    {
-        
-		Console.WriteLine("Button clicked!");
-	}
 }

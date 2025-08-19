@@ -1,7 +1,6 @@
 using MoogleUI.Components;
-using MoogleEngine;
-using MoogleEngine.AppConfig;
 using Shared;
+using MoogleEngine;
 namespace MoogleUI
 {
     public class Program
@@ -9,13 +8,11 @@ namespace MoogleUI
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
+            builder.Services.AddSingleton<ISearchService, Moogle>();
+            builder.Services.AddSingleton<IConfigurationService, MoogleEngine.AppConfig.ConfigurationService>();
             // Add services to the container.
-            //builder.Services.AddRazorComponents();
             builder.Services.AddRazorComponents().AddInteractiveServerComponents();
-            builder.Services.AddServerSideBlazor().AddCircuitOptions(options => {
-                options.DetailedErrors = true;  // Enable detailed errors
-            });
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -31,9 +28,7 @@ namespace MoogleUI
             app.UseStaticFiles();
             app.UseAntiforgery();
 
-            app.MapBlazorHub();  // Essential for event handling
-            app.MapRazorComponents<App>().AddInteractiveServerRenderMode(); ;
-
+            app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 
             app.Run();
         }

@@ -8,11 +8,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MoogleEngine\MoogleEngine.csproj" />
-    <ProjectReference Include="..\Shared\Shared.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Components\Pages\" />
   </ItemGroup>
 
 </Project>
