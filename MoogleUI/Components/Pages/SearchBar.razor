@@ -2,7 +2,7 @@
 @rendermode InteractiveServer
 
 <div class="search-bar">
-    <input type="text" @bind="Query"  class="search-input" />
+    <input type="text" @bind="Query" placeholder="Search query..." class="search-input" autocomplete="off" />
     <button @onclick="PerformSearch" class="search-button">Search</button>
 </div>
 

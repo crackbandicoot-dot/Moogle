@@ -1,1 +1,1 @@
-dotnet watch run --project MoogleServer *> $null
+dotnet watch run --project MoogleUI 
