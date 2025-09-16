@@ -22,16 +22,16 @@
     private IList<SearchItem> AllResults = new List<SearchItem>();
     private IList<SearchItem> CurrentResults = new List<SearchItem>();
     private int CurrentPage = 1;
-    private string Query = "";
+    private string Query="";
     private bool ShowConfigForm = false;
 
     private int TotalPages => 1;
 
     protected override async Task OnInitializedAsync()
     {
-        
-      Config = await ConfigService.LoadConfigurationAsync();
-        
+
+        Config = await ConfigService.LoadConfigurationAsync();
+        Query = "";
     }
 
     private async Task PerformSearch(string query)

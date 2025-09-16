@@ -7,14 +7,12 @@
         @foreach (var result in Results)
         {
             <div class="result-item">
-                <h4 onclick="OnDocumentClick">@result.Title</h4>
-                <p><strong>File:</strong> @result.Title</p>
+                <h4 @onclick="() => OnDocumentClick(result.Title)">@Path.GetFileName(result.Title)</h4>
                 @if (result.RelevantPages.Any())
                 {
                     <p><strong>Pages:</strong> @string.Join(", ", result.RelevantPages)</p>
                 }
                 <p>@result.Snippet</p>
-                
             </div>
         }
     </div>
@@ -22,8 +20,24 @@
 
 @code {
     [Parameter] public IList<SearchItem>? Results { get; set; }
-    private async Task OnDocumentClick()
+
+    private async Task OnDocumentClick(string documentPath)
     {
-        
+        try
+        {
+            new System.Diagnostics.Process
+            {
+                StartInfo = new System.Diagnostics.ProcessStartInfo(documentPath)
+                {
+                    UseShellExecute = true
+                }
+            }.Start();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error opening file: {ex.Message}");
+        }
+        StateHasChanged();
+        await Task.CompletedTask;
     }
 }
