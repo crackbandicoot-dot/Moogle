@@ -1,0 +1,14 @@
+@using Microsoft.AspNetCore.Components
+@rendermode InteractiveServer
+
+<button @onclick="ToggleForm" class="config-button">⚙️</button>
+
+@code {
+    [Parameter] public EventCallback<bool> OnToggleForm { get; set; }
+    [Parameter] public bool ShowForm { get; set; }
+
+    private async Task ToggleForm()
+    {
+        await OnToggleForm.InvokeAsync(!ShowForm);
+    }
+}

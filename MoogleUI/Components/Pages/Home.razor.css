@@ -1,0 +1,31 @@
+.home-container {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background-color: #ffffff;
+    font-family: arial, sans-serif;
+}
+
+/* Google-like centered layout for search page */
+@media (min-width: 768px) {
+    .home-container {
+        padding: 40px 20px;
+        max-width: 584px;
+        margin: 0 auto;
+        justify-content: flex-start;
+        padding-top: 20vh; /* Position search elements higher on page like Google */
+    }
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 767px) {
+    .home-container {
+        padding: 20px 16px;
+        justify-content: flex-start;
+        padding-top: 15vh;
+    }
+}

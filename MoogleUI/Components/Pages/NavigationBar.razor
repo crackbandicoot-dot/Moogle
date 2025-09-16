@@ -1,0 +1,44 @@
+@using Microsoft.AspNetCore.Components
+@rendermode InteractiveServer
+
+@if (TotalPages > 1)
+{
+    <div class="navigation-bar">
+        <button @onclick="GoToPrevious" disabled="CurrentPage == 1" class="nav-button">Previous</button>
+        @for (int i = 1; i <= TotalPages; i++)
+        {
+            <button @onclick="() => GoToPage(i)" class="@(i == CurrentPage ? "nav-button active" : "nav-button")">@i</button>
+        }
+        <button @onclick="GoToNext" disabled="CurrentPage == TotalPages" class="nav-button">Next</button>
+    </div>
+}
+
+@code {
+    [Parameter] public int CurrentPage { get; set; } = 1;
+    [Parameter] public int TotalPages { get; set; } = 1;
+    [Parameter] public EventCallback<int> OnPageChanged { get; set; }
+
+    private async Task GoToPage(int page)
+    {
+        if (page != CurrentPage)
+        {
+            await OnPageChanged.InvokeAsync(page);
+        }
+    }
+
+    private async Task GoToPrevious()
+    {
+        if (CurrentPage > 1)
+        {
+            await OnPageChanged.InvokeAsync(CurrentPage - 1);
+        }
+    }
+
+    private async Task GoToNext()
+    {
+        if (CurrentPage < TotalPages)
+        {
+            await OnPageChanged.InvokeAsync(CurrentPage + 1);
+        }
+    }
+}

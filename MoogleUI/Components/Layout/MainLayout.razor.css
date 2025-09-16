@@ -1,0 +1,70 @@
+.page {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: #ffffff;
+}
+
+main {
+    flex: 1;
+    width: 100%;
+    max-width: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar {
+    display: none; /* Hide sidebar for Google-like clean layout */
+}
+
+.top-row {
+    display: none; /* Hide top row for cleaner Google-like appearance */
+}
+
+@media (max-width: 640.98px) {
+    .page {
+        flex-direction: column;
+    }
+}
+
+@media (min-width: 641px) {
+    .page {
+        flex-direction: column; /* Keep column layout instead of row */
+    }
+
+    .sidebar {
+        display: none; /* Keep sidebar hidden */
+    }
+
+    .top-row {
+        display: none; /* Keep top row hidden */
+    }
+
+    article {
+        padding: 0 !important; /* Remove default padding for clean layout */
+        max-width: none !important;
+        width: 100% !important;
+    }
+}
+
+#blazor-error-ui {
+    color-scheme: light only;
+    background: lightyellow;
+    bottom: 0;
+    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
+    box-sizing: border-box;
+    display: none;
+    left: 0;
+    padding: 0.6rem 1.25rem 0.7rem 1.25rem;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+}
+
+    #blazor-error-ui .dismiss {
+        cursor: pointer;
+        position: absolute;
+        right: 0.75rem;
+        top: 0.5rem;
+    }

@@ -4,19 +4,20 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Configuration;
+using MoogleEngine.AppConfig;
 using MoogleEngine.DocumentsUtils;
 using MoogleEngine.SearchEngine;
 using MoogleEngine.TextReader;
 using MoogleEngine.Utils;
 using UglyToad.PdfPig.Content;
-using Shared;
+
 
 namespace MoogleEngine;
 
 
 public class Moogle :ISearchService
 {
-    private List<SearchItem> _lastQueryResult;
+    private IList<SearchItem> _lastQueryResult;
 
     private string _lastQuery;
     private TextCorpus.VectorizedTextCorpus textCorpus;
@@ -30,9 +31,8 @@ public class Moogle :ISearchService
         IConfiguration config = new ConfigurationBuilder()
             .AddJsonFile("appconfig.json")
             .Build();
-
-        // Bind configuration to class
-        settings = config.GetSection("AppConfig").Get<AppConfig.AppConfig>() ?? throw new Exception("Configuration missing!");
+        IConfigurationService configurationService = new ConfigurationService();
+        settings = configurationService.LoadConfigurationAsync().Result;
         string path = Path.GetFullPath(settings.DataBasePath);
         textCorpus = new TextCorpus.VectorizedTextCorpus(path);
         readerFactory = new TextReaderFactory();
@@ -117,9 +117,9 @@ public class Moogle :ISearchService
         return text[start..end];
     }
 
-    public Task<List<Shared.SearchResult>> SearchAsync(string query, int pageNumber, int resultsPerPage)
+    public Task<IList<SearchItem>> Search(string query)
     {
-        var searchResult = new List<SearchItem>();
+        IList<SearchItem> searchResult = new List<SearchItem>();
         if (_lastQuery == query)
         {
             searchResult = _lastQueryResult;
@@ -129,23 +129,8 @@ public class Moogle :ISearchService
             _lastQuery = query;
             _lastQueryResult = searchResult = Query(query).Items().ToList();
         }
-        var ans = new List<Shared.SearchResult>();
-        for (int i = pageNumber * resultsPerPage; i < Math.Min(searchResult.Count, (pageNumber + 1) * resultsPerPage); i++)
-        {
-            ans.Add(new Shared.SearchResult() { DocumentId = searchResult[i].Title, Title = searchResult[i].Title, Snippet = searchResult[i].Snippet });
-        }
-        return Task.FromResult(ans);
-    }
-
-    public Task<Shared.Document> GetDocumentByIdAsync(string documentId)
-    {
-        // Basic test implementation: returns a dummy document
-        return Task.FromResult(new Shared.Document
-        {
-            Id = documentId,
-            Title = "Test Document",
-            Content = "This is the full content of the test document."
-        });
+        
+        return Task.FromResult(searchResult);
     }
 }
 

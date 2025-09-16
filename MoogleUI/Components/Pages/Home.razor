@@ -1,0 +1,61 @@
+﻿@page "/"
+@using MoogleEngine
+@using MoogleEngine.AppConfig
+@inject ISearchService SearchService
+@inject IConfigurationService ConfigService
+@rendermode InteractiveServer
+
+<PageTitle>Moogle!</PageTitle>
+
+<div class="home-container">
+    <ConfigButton OnToggleForm="ToggleConfigForm" ShowForm="ShowConfigForm" />
+    <ConfigForm ShowForm="ShowConfigForm" ShowFormChanged="ToggleConfigForm" Config="Config" ConfigService="ConfigService" />
+
+    <MoogleTitle />
+    <SearchBar Query="Query" OnSearch="PerformSearch" />
+    <SearchResults Results="CurrentResults" />
+    <NavigationBar CurrentPage="CurrentPage" TotalPages="TotalPages" OnPageChanged="ChangePage" />
+</div>
+
+@code {
+    private AppConfig Config = new AppConfig();
+    private IList<SearchItem> AllResults = new List<SearchItem>();
+    private IList<SearchItem> CurrentResults = new List<SearchItem>();
+    private int CurrentPage = 1;
+    private string Query = "";
+    private bool ShowConfigForm = false;
+
+    private int TotalPages => 1;
+
+    protected override async Task OnInitializedAsync()
+    {
+        
+      Config = await ConfigService.LoadConfigurationAsync();
+        
+    }
+
+    private async Task PerformSearch(string query)
+    {
+        Query = query;
+        AllResults = await SearchService.Search(query);
+        CurrentPage = 1;
+        UpdateCurrentResults();
+    }
+
+    private void UpdateCurrentResults()
+    {
+        int start = (CurrentPage - 1) * Config.NumbersOfResultsShowed;
+        CurrentResults = AllResults.Skip(start).Take(Config.NumbersOfResultsShowed).ToList();
+    }
+
+    private void ChangePage(int page)
+    {
+        CurrentPage = page;
+        UpdateCurrentResults();
+    }
+    
+    private void ToggleConfigForm(bool show)
+    {
+        ShowConfigForm = show;
+    }
+}

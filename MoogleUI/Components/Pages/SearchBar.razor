@@ -1,46 +1,20 @@
-@*
-    File: SearchBar.razor
-    Component: UI Components
-*@
-
 @using Microsoft.AspNetCore.Components
-@using Microsoft.AspNetCore.Components.Web
+@rendermode InteractiveServer
 
-<div class="search-bar-container">
-    <input type="text" class="search-input" placeholder="Enter your search query..." @bind="_searchQuery" />
-    <button class="search-button" @onclick="SubmitSearch">Search</button>
+<div class="search-bar">
+    <input type="text" @bind="Query" placeholder="Enter your search query" class="search-input" />
+    <button @onclick="PerformSearch" class="search-button">Search</button>
 </div>
 
 @code {
-    /// <summary>
-    /// The current text entered into the search bar by the user.
-    /// </summary>
-    private string _searchQuery = string.Empty;
+    [Parameter] public string Query { get; set; } = "";
+    [Parameter] public EventCallback<string> OnSearch { get; set; }
 
-    /// <summary>
-    /// An event callback that is invoked when the user submits a search query.
-    /// The parent component will handle this event to perform the actual search.
-    /// </summary>
-    [Parameter]
-    public EventCallback<string> OnSearchSubmitted { get; set; }
-
-    /// <summary>
-    /// Invokes the OnSearchSubmitted event callback with the current search query.
-    /// This method is called when the search button is clicked.
-    /// </summary>
-    /// <returns>A Task representing the asynchronous operation.</returns>
-    private Task SubmitSearch()
+    private async Task PerformSearch()
     {
-        // 3. It's good practice to also check if _searchQuery is not null or whitespace before invoking.
-        if (!string.IsNullOrWhiteSpace(_searchQuery))
+        if (!string.IsNullOrWhiteSpace(Query))
         {
-            // 1. Check if the OnSearchSubmitted callback has a delegate assigned.
-            // 2. If it does, invoke it with the current value of _searchQuery.
-            // Note: InvokeAsync handles the check for a delegate internally.
-            return OnSearchSubmitted.InvokeAsync(_searchQuery);
+            await OnSearch.InvokeAsync(Query);
         }
-        return Task.CompletedTask;
     }
-
-   
 }

@@ -1,0 +1,60 @@
+.config-button {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    border-radius: 50%;
+    color: #5f6368;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+    z-index: 100;
+    outline: none;
+}
+
+.config-button:hover {
+    background-color: rgba(60, 64, 67, 0.08);
+    color: #202124;
+}
+
+.config-button:focus {
+    background-color: rgba(60, 64, 67, 0.12);
+    outline: none;
+}
+
+.config-button:active {
+    background-color: rgba(60, 64, 67, 0.16);
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+    .config-button {
+        top: 12px;
+        right: 12px;
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+    }
+}
+
+/* Google Apps grid icon styling (if using a grid icon) */
+.config-button.grid-icon {
+    font-family: 'Material Icons', arial, sans-serif;
+}
+
+/* Alternative styling for settings gear icon */
+.config-button.settings-icon {
+    font-size: 20px;
+}
+
+@media (max-width: 768px) {
+    .config-button.settings-icon {
+        font-size: 18px;
+    }
+}

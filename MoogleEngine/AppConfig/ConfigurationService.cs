@@ -2,29 +2,26 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
-using Shared;
 
 namespace MoogleEngine.AppConfig
 {
     public class ConfigurationService : IConfigurationService
     {
-        public Task<SearchConfiguration> LoadConfigurationAsync()
+        private static string _configPath= @"C:\Users\PC\Desktop\QuickAcces\Moogle\MoogleEngine\appconfig.json";
+        public Task<AppConfig> LoadConfigurationAsync()
         {
-            // Return a default SearchConfiguration for testing purposes
-            var config = new SearchConfiguration
-            {
-                ResultsPerPage = 2,
-                SnippetLength = 400,
-                Theme = "Dark",
-                SearchIndexPath = "test-index.json"
-            };
+            
+            var serializedConfig = File.ReadAllText(_configPath);
+            var config = JsonSerializer.Deserialize<AppConfig>(serializedConfig);
             return Task.FromResult(config);
         }
 
-        public Task SaveConfigurationAsync(SearchConfiguration configuration)
+        public Task SaveConfigurationAsync(AppConfig configuration)
         {
-            // Simulate saving by doing nothing (testing stub)
+            var serializedConfig = JsonSerializer.Serialize(configuration);
+            File.WriteAllText(_configPath, serializedConfig);
             return Task.CompletedTask;
         }
     }

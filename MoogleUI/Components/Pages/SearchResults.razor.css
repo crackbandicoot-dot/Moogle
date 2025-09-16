@@ -1,0 +1,96 @@
+.search-results {
+    margin-top: 30px;
+    max-width: 600px;
+    width: 100%;
+    font-family: arial, sans-serif;
+}
+
+.result-item {
+    margin-bottom: 32px;
+    padding: 0;
+    border: none;
+}
+
+.result-item h4 {
+    margin: 0 0 4px 0;
+    font-size: 20px;
+    font-weight: normal;
+    line-height: 1.3;
+    color: #1a0dab;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.result-item h4:hover {
+    text-decoration: underline;
+}
+
+.result-item p {
+    margin: 0 0 8px 0;
+    font-size: 14px;
+    line-height: 1.58;
+    color: #4d5156;
+}
+
+.result-url {
+    font-size: 14px;
+    color: #202124;
+    margin-bottom: 4px;
+    line-height: 1.3;
+}
+
+.result-url:hover {
+    text-decoration: underline;
+}
+
+.snippets {
+    margin-top: 12px;
+}
+
+.snippet {
+    background-color: transparent;
+    padding: 0;
+    margin: 8px 0;
+    border: none;
+    border-left: 3px solid #dadce0;
+    padding-left: 12px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-width: 100%;
+    font-size: 14px;
+    line-height: 1.58;
+    color: #4d5156;
+}
+
+.snippet:hover {
+    border-left-color: #1a0dab;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+    .search-results {
+        margin-top: 20px;
+        padding: 0 16px;
+    }
+    
+    .result-item {
+        margin-bottom: 24px;
+    }
+    
+    .result-item h4 {
+        font-size: 18px;
+    }
+    
+    .snippet {
+        padding-left: 8px;
+        border-left-width: 2px;
+    }
+}
+
+/* Results stats styling (if you have a results count component) */
+.results-stats {
+    font-size: 14px;
+    color: #70757a;
+    margin-bottom: 20px;
+    padding: 0;
+}

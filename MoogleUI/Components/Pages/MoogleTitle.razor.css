@@ -1,0 +1,44 @@
+.moogle-title {
+    font-family: arial, sans-serif;
+    font-size: 90px;
+    font-weight: normal;
+    text-align: center;
+    margin: 0 0 35px 0;
+    line-height: 1.1;
+    color: #202124;
+    letter-spacing: -5px;
+}
+
+.letter {
+    display: inline-block;
+    transition: transform 0.2s ease-in-out;
+}
+
+.letter:hover {
+    transform: scale(1.1);
+}
+
+/* Responsive font sizing like Google */
+@media (max-width: 768px) {
+    .moogle-title {
+        font-size: 60px;
+        margin-bottom: 25px;
+        letter-spacing: -3px;
+    }
+}
+
+@media (max-width: 480px) {
+    .moogle-title {
+        font-size: 44px;
+        margin-bottom: 20px;
+        letter-spacing: -2px;
+    }
+}
+
+/* Google-like colorful letters (you can customize these colors) */
+.letter:nth-child(1) { color: #4285f4; } /* Blue */
+.letter:nth-child(2) { color: #ea4335; } /* Red */
+.letter:nth-child(3) { color: #fbbc05; } /* Yellow */
+.letter:nth-child(4) { color: #4285f4; } /* Blue */
+.letter:nth-child(5) { color: #34a853; } /* Green */
+.letter:nth-child(6) { color: #ea4335; } /* Red */

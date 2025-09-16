@@ -1,0 +1,47 @@
+@using System.Reflection
+@using Microsoft.AspNetCore.Components
+@using MoogleEngine
+@using MoogleEngine.AppConfig
+
+@rendermode InteractiveServer
+
+@if (ShowForm)
+{
+    <div class="config-form">
+        <h3>Configuration</h3>
+        <EditForm Model="Config" OnValidSubmit="SaveConfig" >
+            <DataAnnotationsValidator />
+            <div class="form-group">
+                <label>DataBaseFolderPath</label>
+                <InputText @bind-Value="Config.DataBasePath" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label>ResultsPerPage</label>
+                <InputNumber @bind-Value="Config.NumbersOfResultsShowed" class="form-control" />
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Save</button>
+            @* <button type="button" @onclick="LoadConfig" class="btn btn-secondary">Load</button> *@
+            <button type="button" @onclick="CloseForm" class="btn btn-secondary">Close</button>
+        </EditForm>
+    </div>
+}
+
+@code {
+    [Parameter] public bool ShowForm { get; set; }
+    [Parameter] public EventCallback<bool> ShowFormChanged { get; set; }
+    [Parameter] public AppConfig Config { get; set; } = null!;
+    [Parameter] public IConfigurationService ConfigService { get; set; } = null!;
+
+    private async Task SaveConfig()
+    {
+        await ConfigService?.SaveConfigurationAsync(Config);
+        await ShowFormChanged.InvokeAsync(false);
+        
+    }
+
+    private async Task CloseForm()
+    {
+        await ShowFormChanged.InvokeAsync(false);
+    }
+}

@@ -1,6 +1,6 @@
-namespace Shared
+namespace MoogleEngine
 {
-    using Shared;
+  
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
@@ -21,7 +21,7 @@ namespace Shared
         /// A Task that represents the asynchronous operation. The task result contains a list of
         /// SearchResult objects matching the query for the specified page. Returns an empty list if no results are found.
         /// </returns>
-        Task<List<SearchResult>> Search(string query);
+        Task<IList<SearchItem>> Search(string query);
 
     }
 }
