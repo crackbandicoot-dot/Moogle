@@ -2,19 +2,19 @@
 @rendermode InteractiveServer
 
 <div class="search-bar">
-    <input type="text" @bind="Query" placeholder="Search query..." class="search-input" autocomplete="off" />
+    <input type="text" @bind="query" placeholder="Search query..." class="search-input" autocomplete="off" />
     <button @onclick="PerformSearch" class="search-button">Search</button>
 </div>
 
 @code {
-    [Parameter] public string Query { get; set; } = "";
+    private string query = "";
     [Parameter] public EventCallback<string> OnSearch { get; set; }
 
     private async Task PerformSearch()
     {
-        if (!string.IsNullOrWhiteSpace(Query))
+        if (!string.IsNullOrWhiteSpace(query))
         {
-            await OnSearch.InvokeAsync(Query);
+            await OnSearch.InvokeAsync(query);
         }
     }
 }
