@@ -35,6 +35,56 @@ The search flow is:
    - operator evaluation over word frequencies.
 7. Return the results with title, snippet, and relevant pages.
 
+```mermaid
+flowchart TD
+    A[User enters query in the UI] --> B[MoogleUI]
+    B --> C[MoogleEngine.Moogle]
+    C --> D[Load appconfig.json]
+    C --> E[Read corpus from DataBasePath]
+    E --> F[TXTReader / PDFReader]
+    F --> G[Normalize text and build page vectors]
+    C --> H[Compile query operators]
+    H --> I[Evaluate query against each page]
+    G --> I
+    I --> J[Rank pages by score]
+    J --> K[Build SearchResult]
+    K --> L[Display title, snippet, and pages]
+```
+
+## Architecture overview
+
+```mermaid
+flowchart LR
+    subgraph UI[Presentation layer]
+        U[MoogleUI]
+        C1[MoogleController]
+    end
+
+    subgraph Engine[Search engine]
+        M[Moogle.cs]
+        Q[Query compiler]
+        S[SearchEngine]
+        T[TextCorpus]
+        R[Text readers]
+    end
+
+    subgraph Shared[Shared contracts]
+        I1[ISearchService]
+        I2[IConfigurationService]
+        D[SearchItem / SearchResult]
+    end
+
+    U --> M
+    C1 --> U
+    M --> Q
+    M --> S
+    M --> T
+    T --> R
+    M --> D
+    U --> I1
+    U --> I2
+```
+
 ## Query syntax
 
 Queries can include plain words and operators.
@@ -70,6 +120,17 @@ The ranking combines two ideas:
 - **Operator evaluation** over term frequencies on each page.
 
 In practice, this favors documents with more relevant terms and filters out documents that do not satisfy the query operators.
+
+```mermaid
+flowchart LR
+    Q[Query string] --> L[Lexer]
+    L --> P[Parser]
+    P --> O[Operator tree]
+    O --> E[Evaluate term frequencies]
+    T[Document/page vectors] --> S[Cosine similarity]
+    E --> R[Final score]
+    S --> R
+```
 
 ## Project structure
 
