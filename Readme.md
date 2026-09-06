@@ -21,6 +21,23 @@ Moogle! is an offline search engine developed in C# with a Blazor web interface.
 - Configurable data directory and number of results shown.
 - Caching of the last query to avoid recomputing the same search.
 
+## Query syntax
+
+Queries can include plain words and operators.
+
+### Operators
+
+- `^word`: document where `word` exists.
+- `!word`: document where `word` does not exist.
+- `*word`: gives more relevance to `word`.
+
+### Examples
+
+- `algorithms sorting`
+- `^pdf !image`
+- `*programming ^csharp`
+- `!noise *relevance`
+- `*^query` is also processed by the operator compiler.
 ## How it works
 
 The search flow is:
@@ -85,23 +102,7 @@ flowchart LR
     U --> I2
 ```
 
-## Query syntax
 
-Queries can include plain words and operators.
-
-### Operators
-
-- `^word`: document where `word` exists.
-- `!word`: document where `word` does not exist.
-- `*word`: gives more relevance to `word`.
-
-### Examples
-
-- `algorithms sorting`
-- `^pdf !image`
-- `*programming ^csharp`
-- `!noise *relevance`
-- `*^query` is also processed by the operator compiler.
 
 ## Supported formats
 
