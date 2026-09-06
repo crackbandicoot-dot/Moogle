@@ -2,91 +2,91 @@
 
 ![Moogle](moogle.png)
 
-> Proyecto de Programación I.  
-> Facultad de Matemática y Computación - Universidad de La Habana.  
-> Cursos 2021, 2022.
+> Programming I project.  
+> Faculty of Mathematics and Computer Science - University of Havana.  
+> Courses 2021, 2022.
 
-Moogle! es un motor de búsqueda offline desarrollado en C# con una interfaz web en Blazor. Indexa documentos desde una carpeta configurable y permite hacer consultas con ranking por relevancia, operadores de búsqueda y soporte para archivos PDF y TXT.
+Moogle! is an offline search engine developed in C# with a Blazor web interface. It indexes documents from a configurable folder and lets you search them using relevance ranking, query operators, and support for both PDF and TXT files.
 
-## Características
+## Features
 
-- Búsqueda en archivos **.txt** y **.pdf**.
-- Recorrido recursivo de la carpeta de documentos configurada.
-- Ranking basado en **modelo vectorial** con similitud del coseno.
-- Ponderación de consultas mediante operadores:
-  - `^palabra` → la palabra debe existir.
-  - `!palabra` → la palabra no debe existir.
-  - `*palabra` → aumenta su peso en la consulta.
-- Snippets de contexto para cada resultado.
-- Configuración del directorio de datos y del número de resultados mostrados.
-- Caché del último query para evitar recalcular la misma búsqueda.
+- Search across **.txt** and **.pdf** files.
+- Recursive scan of the configured documents folder.
+- Ranking based on a **vector-space model** with cosine similarity.
+- Query weighting through operators:
+  - `^word` → the word must exist.
+  - `!word` → the word must not exist.
+  - `*word` → boosts the importance of the word in the query.
+- Context snippets for each result.
+- Configurable data directory and number of results shown.
+- Caching of the last query to avoid recomputing the same search.
 
-## Cómo funciona
+## How it works
 
-El flujo general de búsqueda es el siguiente:
+The search flow is:
 
-1. Se carga la configuración desde `appconfig.json`.
-2. Se leen los documentos del directorio configurado.
-3. Se extrae y normaliza el texto de cada página o archivo.
-4. Se vectoriza el corpus.
-5. La consulta se compila en una expresión de operadores.
-6. Se calcula un score para cada página combinando:
-   - la similitud entre el vector de la query y el vector del documento;
-   - la evaluación de los operadores sobre la frecuencia de palabras.
-7. Se devuelven los resultados con título, snippet y páginas relevantes.
+1. Load configuration from `appconfig.json`.
+2. Read the documents from the configured directory.
+3. Extract and normalize the text from each page or file.
+4. Vectorize the corpus.
+5. Compile the query into an operator expression.
+6. Compute a score for each page by combining:
+   - similarity between the query vector and the document vector;
+   - operator evaluation over word frequencies.
+7. Return the results with title, snippet, and relevant pages.
 
-## Sintaxis de consulta
+## Query syntax
 
-La consulta puede incluir palabras normales y operadores.
+Queries can include plain words and operators.
 
-### Operadores
+### Operators
 
-- `^word`: documento donde `word` exista.
-- `!word`: documento donde `word` no exista.
-- `*word`: da mayor relevancia a `word`.
+- `^word`: document where `word` exists.
+- `!word`: document where `word` does not exist.
+- `*word`: gives more relevance to `word`.
 
-### Ejemplos
+### Examples
 
-- `algoritmos de ordenacion`
-- `^pdf !imagen`
-- `*programacion ^csharp`
-- `!ruido *relevancia`
-- `*^consulta` también es procesada como parte del compilador de operadores.
+- `algorithms sorting`
+- `^pdf !image`
+- `*programming ^csharp`
+- `!noise *relevance`
+- `*^query` is also processed by the operator compiler.
 
-## Formatos soportados
+## Supported formats
 
-Moogle lee documentos con estas extensiones:
+Moogle reads documents with these extensions:
 
 - `.txt`
 - `.pdf`
 
-Los PDFs se procesan por página usando **PdfPig**.
+PDFs are processed page by page using **PdfPig**.
 
-## Modelo de ranking
+## Ranking model
 
-El ranking combina dos ideas:
+The ranking combines two ideas:
 
-- **Similitud del coseno** entre el vector de la consulta y el vector del documento.
-- **Evaluación de operadores** sobre la frecuencia de términos en la página.
+- **Cosine similarity** between the query vector and the document vector.
+- **Operator evaluation** over term frequencies on each page.
 
-En la práctica, esto favorece documentos con más términos relevantes y penaliza o filtra documentos que no cumplen los operadores de consulta.
+In practice, this favors documents with more relevant terms and filters out documents that do not satisfy the query operators.
 
-## Estructura del proyecto
+## Project structure
 
-- `MoogleEngine/` → lógica de búsqueda, lectura de documentos y ranking.
-- `MoogleUI/` → interfaz web.
-- `MoogleController/` → controlador de escritorio para iniciar y detener la UI.
-- `Shared/` → interfaces compartidas.
+- `MoogleEngine/` → search logic, document reading, and ranking.
+- `MoogleUI/` → web interface.
+- `MoogleController/` → desktop controller to start and stop the UI.
+- `Shared/` → shared interfaces and models.
 
-## Requisitos
+## Requirements
 
 - .NET 8.0
-- Una carpeta con documentos `.txt` y/o `.pdf`
+- A folder containing `.txt` and/or `.pdf` documents
 
-## Ejecución
+## Running
 
-Usa el script incluido o ejecuta el proyecto UI con .NET.
+Use the included script or run the UI project directly with .NET.
 
-## Nota
+## Note
 
-Se conserva la imagen del README original por ahora.
+The original README image is kept for now.
