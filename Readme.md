@@ -54,7 +54,7 @@ Queries can include plain words and operators.
    cd Moogle
    ```
 
-2. **Configure your documents folder**
+2. **Configure your documents folder(or edit on the GUI)**
    - Open or create `appconfig.json` in the root directory
    - Set the `DataBasePath` to point to your documents folder
    - Example:
