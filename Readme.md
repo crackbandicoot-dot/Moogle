@@ -6,7 +6,7 @@
 > Faculty of Mathematics and Computer Science - University of Havana.  
 > Courses 2021, 2022.
 
-Moogle! is an offline search engine developed in C# with a Blazor web interface. It indexes documents from a configurable folder and lets you search them using relevance ranking, query operators, and support for both PDF and TXT files.
+Moogle! is an offline search engine developed in C# with a Blazor web interface. It indexes documents from a configurable folder and lets you search them using relevance ranking, query operators, and context snippets.
 
 ## Features
 
@@ -38,6 +38,59 @@ Queries can include plain words and operators.
 - `*programming ^csharp`
 - `!noise *relevance`
 - `*^query` is also processed by the operator compiler.
+
+## Installation & Running
+
+### Requirements
+
+- **.NET 8.0** or later
+- A folder containing `.txt` and/or `.pdf` documents to search
+
+### Setup Steps
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/crackbandicoot-dot/Moogle.git
+   cd Moogle
+   ```
+
+2. **Configure your documents folder**
+   - Open or create `appconfig.json` in the root directory
+   - Set the `DataBasePath` to point to your documents folder
+   - Example:
+     ```json
+     {
+       "DataBasePath": "./documents",
+       "MaxResultsCount": 10
+     }
+     ```
+
+3. **Run the application**
+   
+   Using the included script:
+   ```bash
+   ./run.sh  # On Linux/macOS
+   # or
+   run.bat   # On Windows
+   ```
+
+   Or run directly with .NET:
+   ```bash
+   dotnet run --project MoogleUI
+   ```
+
+4. **Access the search engine**
+   - The application will start the Blazor web interface
+   - Open your browser to the displayed URL (typically `http://localhost:5000`)
+   - Start searching your documents!
+
+### Quick Example
+
+Once running:
+1. Enter a search query like `algorithms` to find all documents containing that word
+2. Use operators like `^required !exclude *important` to refine your search
+3. Click on results to view the matched content and snippets
+
 ## How it works
 
 The search flow is:
@@ -139,15 +192,6 @@ flowchart LR
 - `MoogleUI/` → web interface.
 - `MoogleController/` → desktop controller to start and stop the UI.
 - `Shared/` → shared interfaces and models.
-
-## Requirements
-
-- .NET 8.0
-- A folder containing `.txt` and/or `.pdf` documents
-
-## Running
-
-Use the included script or run the UI project directly with .NET.
 
 ## Note
 
