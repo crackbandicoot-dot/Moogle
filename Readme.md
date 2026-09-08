@@ -1,6 +1,6 @@
 # Moogle!
 
-![Moogle](moogle.png)
+![Moogle](moogle_search.png)
 
 > Programming I project.  
 > Faculty of Mathematics and Computer Science - University of Havana.  
