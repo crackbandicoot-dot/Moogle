@@ -1,4 +1,5 @@
 # Moogle!
+Moogle! is an **offline search engine** developed in C# with a Blazor web interface. It indexes documents from a configurable folder and lets you search them using relevance ranking, query operators, and context snippets.
 
 ![Moogle](moogle_search.png)
 
@@ -6,7 +7,7 @@
 > Faculty of Mathematics and Computer Science - University of Havana.  
 > Courses 2021, 2022.
 
-Moogle! is an offline search engine developed in C# with a Blazor web interface. It indexes documents from a configurable folder and lets you search them using relevance ranking, query operators, and context snippets.
+
 
 ## Features
 
