@@ -44,7 +44,7 @@ Queries can include plain words and operators.
 
 ### Requirements
 
-- **.NET 8.0** or later
+- **.NET 9.0** or later
 - A folder containing `.txt` and/or `.pdf` documents to search
 
 ### Setup Steps
@@ -68,14 +68,6 @@ Queries can include plain words and operators.
 
 3. **Run the application**
    
-   Using the included script:
-   ```bash
-   ./run.sh  # On Linux/macOS
-   # or
-   run.bat   # On Windows
-   ```
-
-   Or run directly with .NET:
    ```bash
    dotnet run --project MoogleUI
    ```
@@ -194,6 +186,4 @@ flowchart LR
 - `MoogleController/` → desktop controller to start and stop the UI.
 - `Shared/` → shared interfaces and models.
 
-## Note
 
-The original README image is kept for now.
